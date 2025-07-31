@@ -50,7 +50,7 @@ class ProductSubtype(db.Model):
 
     __table_args__ = (
         db.UniqueConstraint('name', 'category_id', 'mine_id',
-                            name='uq_subtype_category_mine')
+                            name='uq_subtype_category_mine'),
     )
 
     def __repr__(self):
