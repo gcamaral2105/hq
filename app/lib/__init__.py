@@ -11,14 +11,13 @@ __author__ = "HQ Development Team"
 
 # Imports principais
 from .repository import BaseRepository, RepositoryMixin
-from .services import BaseService, ServiceMixin
+from .services import BaseService
 from .utils import ValidationUtils, StringUtils
 
 __all__ = [
     'BaseRepository',
     'RepositoryMixin',
     'BaseService', 
-    'ServiceMixin',
     'ValidationUtils',
     'StringUtils'
 ]
