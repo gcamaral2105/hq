@@ -13,8 +13,10 @@ def create_app(config_class='config.Config'):
     with app.app_context():
         from app.main import main_bp
         from app.settings import settings_bp
+        from app.product import product_bp
 
         app.register_blueprint(main_bp, url_prefix="/")
         app.register_blueprint(settings_bp, url_prefix="/settings")
+        app.register_blueprint(product_bp, url_prefix="/product")
 
     return app
