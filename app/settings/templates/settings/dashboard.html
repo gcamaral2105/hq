@@ -1,0 +1,256 @@
+{% extends "settings/base.html" %}
+
+{% block title %}Dashboard - Settings{% endblock %}
+
+{% block page_title %}Settings Dashboard{% endblock %}
+
+{% block page_subtitle %}
+<p class="content-subtitle">Overview of system configuration and quick access to management tools</p>
+{% endblock %}
+
+{% block content %}
+<!-- Statistics Cards -->
+<div class="dashboard-grid">
+    <div class="stat-card">
+        <i class="fas fa-tags stat-icon"></i>
+        <h3 class="stat-number">{{ stats.categories or 0 }}</h3>
+        <p class="stat-label">Product Categories</p>
+        <div class="mt-3">
+            <a href="{{ url_for('settings_bp.categories_list') }}" class="btn-primary">
+                <i class="fas fa-eye"></i> View All
+            </a>
+            <a href="{{ url_for('settings_bp.category_create') }}" class="btn-secondary ms-2">
+                <i class="fas fa-plus"></i> Add New
+            </a>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <i class="fas fa-mountain stat-icon"></i>
+        <h3 class="stat-number">{{ stats.mines or 0 }}</h3>
+        <p class="stat-label">Mining Locations</p>
+        <div class="mt-3">
+            <a href="{{ url_for('settings_bp.mines_list') }}" class="btn-primary">
+                <i class="fas fa-eye"></i> View All
+            </a>
+            <a href="{{ url_for('settings_bp.mine_create') }}" class="btn-secondary ms-2">
+                <i class="fas fa-plus"></i> Add New
+            </a>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <i class="fas fa-sitemap stat-icon"></i>
+        <h3 class="stat-number">{{ stats.subtypes or 0 }}</h3>
+        <p class="stat-label">Product Subtypes</p>
+        <div class="mt-3">
+            <a href="{{ url_for('settings_bp.subtypes_list') }}" class="btn-primary">
+                <i class="fas fa-eye"></i> View All
+            </a>
+            <a href="{{ url_for('settings_bp.subtype_create') }}" class="btn-secondary ms-2">
+                <i class="fas fa-plus"></i> Add New
+            </a>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <i class="fas fa-cogs stat-icon"></i>
+        <h3 class="stat-number">{{ (stats.categories or 0) + (stats.mines or 0) + (stats.subtypes or 0) }}</h3>
+        <p class="stat-label">Total Configurations</p>
+        <div class="mt-3">
+            <small class="text-muted">System-wide settings</small>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Access Sections -->
+<div class="row">
+    <!-- Recent Categories -->
+    <div class="col-lg-4 mb-4">
+        <div class="settings-card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-tags me-2"></i>
+                    Recent Categories
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if recent_categories %}
+                    <div class="list-group list-group-flush">
+                        {% for category in recent_categories %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <strong>{{ category.name }}</strong>
+                                {% if category.description %}
+                                <br><small class="text-muted">{{ category.description[:50] }}{% if category.description|length > 50 %}...{% endif %}</small>
+                                {% endif %}
+                            </div>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('settings_bp.category_edit', category_id=category.id) }}" 
+                                   class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-3">
+                        <a href="{{ url_for('settings_bp.categories_list') }}" class="btn btn-sm btn-outline-primary">
+                            View All Categories <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-tags fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No categories created yet</p>
+                        <a href="{{ url_for('settings_bp.category_create') }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Create First Category
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Mines -->
+    <div class="col-lg-4 mb-4">
+        <div class="settings-card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-mountain me-2"></i>
+                    Recent Mines
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if recent_mines %}
+                    <div class="list-group list-group-flush">
+                        {% for mine in recent_mines %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <strong>{{ mine.name }}</strong>
+                                {% if mine.description %}
+                                <br><small class="text-muted">{{ mine.description[:50] }}{% if mine.description|length > 50 %}...{% endif %}</small>
+                                {% endif %}
+                            </div>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('settings_bp.mine_edit', mine_id=mine.id) }}" 
+                                   class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-3">
+                        <a href="{{ url_for('settings_bp.mines_list') }}" class="btn btn-sm btn-outline-primary">
+                            View All Mines <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-mountain fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No mines created yet</p>
+                        <a href="{{ url_for('settings_bp.mine_create') }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Create First Mine
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="col-lg-4 mb-4">
+        <div class="settings-card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-bolt me-2"></i>
+                    Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('settings_bp.category_create') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-plus me-2"></i>
+                        Add Product Category
+                    </a>
+                    <a href="{{ url_for('settings_bp.mine_create') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-plus me-2"></i>
+                        Add Mining Location
+                    </a>
+                    <a href="{{ url_for('settings_bp.subtype_create') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-plus me-2"></i>
+                        Add Product Subtype
+                    </a>
+                    <hr>
+                    <a href="{{ url_for('product_bp.dashboard') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-cube me-2"></i>
+                        Products Module
+                    </a>
+                    <a href="{{ url_for('main_bp.home') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-home me-2"></i>
+                        Back to Main
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Information -->
+<div class="row">
+    <div class="col-12">
+        <div class="settings-card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-info-circle me-2"></i>
+                    System Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Product Data Summary</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Categories:</strong> {{ stats.categories or 0 }} configured</li>
+                            <li><strong>Mines:</strong> {{ stats.mines or 0 }} locations</li>
+                            <li><strong>Subtypes:</strong> {{ stats.subtypes or 0 }} product variants</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>System Status</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Total Configurations:</strong> {{ (stats.categories or 0) + (stats.mines or 0) + (stats.subtypes or 0) }}</li>
+                            <li><strong>Settings Module:</strong> Active</li>
+                            <li><strong>Last Updated:</strong> {{ moment().format('YYYY-MM-DD') if moment else 'Today' }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Add some interactivity to the dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate stat cards on load
+    const statCards = document.querySelectorAll('.stat-card');
+    statCards.forEach((card, index) => {
+        setTimeout(() => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'all 0.5s ease';
+            
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100);
+        }, index * 100);
+    });
+});
+</script>
+{% endblock %}
+

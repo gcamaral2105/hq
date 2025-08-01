@@ -1,0 +1,131 @@
+{% extends "settings/base.html" %}
+
+{% block title %}Product Categories - Settings{% endblock %}
+
+{% block page_title %}Product Categories{% endblock %}
+
+{% block page_subtitle %}
+<p class="content-subtitle">Manage product categories for bauxite classification</p>
+{% endblock %}
+
+{% block header_actions %}
+<a href="{{ url_for('settings_bp.category_create') }}" class="btn-primary">
+    <i class="fas fa-plus"></i> Add Category
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="settings-card">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="fas fa-tags me-2"></i>
+            All Product Categories
+        </h5>
+    </div>
+    <div class="card-body">
+        {% if categories %}
+            <div class="table-responsive">
+                <table class="settings-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Subtypes</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for category in categories %}
+                        <tr>
+                            <td>
+                                <strong>{{ category.name }}</strong>
+                            </td>
+                            <td>
+                                {% if category.description %}
+                                    {{ category.description[:100] }}{% if category.description|length > 100 %}...{% endif %}
+                                {% else %}
+                                    <span class="text-muted">No description</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-primary">{{ category.subtypes|length }} subtypes</span>
+                            </td>
+                            <td>
+                                {% if category.created_at %}
+                                    <small class="text-muted">{{ category.created_at.strftime('%Y-%m-%d') }}</small>
+                                {% else %}
+                                    <small class="text-muted">Unknown</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('settings_bp.category_edit', category_id=category.id) }}" 
+                                       class="btn btn-outline-primary" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% if category.subtypes|length == 0 %}
+                                    <form method="POST" action="{{ url_for('settings_bp.category_delete', category_id=category.id) }}" 
+                                          class="d-inline">
+                                        <button type="submit" class="btn btn-outline-danger" 
+                                                data-confirm-delete data-item-name="{{ category.name }}" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                    {% else %}
+                                    <button class="btn btn-outline-secondary" disabled title="Cannot delete - has subtypes">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-tags fa-4x text-muted mb-4"></i>
+                <h4 class="text-muted">No Categories Found</h4>
+                <p class="text-muted mb-4">Start by creating your first product category to organize your bauxite products.</p>
+                <a href="{{ url_for('settings_bp.category_create') }}" class="btn-primary">
+                    <i class="fas fa-plus"></i> Create First Category
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if categories %}
+<!-- Summary Card -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="settings-card">
+            <div class="card-body">
+                <h6><i class="fas fa-chart-bar me-2"></i>Category Summary</h6>
+                <ul class="list-unstyled mb-0">
+                    <li><strong>Total Categories:</strong> {{ categories|length }}</li>
+                    <li><strong>Categories with Subtypes:</strong> {{ categories|selectattr('subtypes')|list|length }}</li>
+                    <li><strong>Empty Categories:</strong> {{ categories|rejectattr('subtypes')|list|length }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="settings-card">
+            <div class="card-body">
+                <h6><i class="fas fa-lightbulb me-2"></i>Quick Tips</h6>
+                <ul class="list-unstyled mb-0 small">
+                    <li>• Categories help organize your bauxite products</li>
+                    <li>• Each category can have multiple subtypes</li>
+                    <li>• Categories with subtypes cannot be deleted</li>
+                    <li>• Use descriptive names for better organization</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+

@@ -1,0 +1,162 @@
+{% extends "settings/base.html" %}
+
+{% block title %}Product Subtypes - Settings{% endblock %}
+
+{% block page_title %}Product Subtypes{% endblock %}
+
+{% block page_subtitle %}
+<p class="content-subtitle">Manage product subtypes that combine categories and mining locations</p>
+{% endblock %}
+
+{% block header_actions %}
+<a href="{{ url_for('settings_bp.subtype_create') }}" class="btn-primary">
+    <i class="fas fa-plus"></i> Add Subtype
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="settings-card">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="fas fa-sitemap me-2"></i>
+            All Product Subtypes
+        </h5>
+    </div>
+    <div class="card-body">
+        {% if subtypes %}
+            <div class="table-responsive">
+                <table class="settings-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Mine</th>
+                            <th>Description</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for subtype in subtypes %}
+                        <tr>
+                            <td>
+                                <strong>{{ subtype.name }}</strong>
+                            </td>
+                            <td>
+                                {% if subtype.category %}
+                                    <span class="badge bg-primary">{{ subtype.category.name }}</span>
+                                {% else %}
+                                    <span class="text-muted">No category</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if subtype.mine %}
+                                    <span class="badge bg-success">{{ subtype.mine.name }}</span>
+                                {% else %}
+                                    <span class="text-muted">No mine</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if subtype.description %}
+                                    {{ subtype.description[:80] }}{% if subtype.description|length > 80 %}...{% endif %}
+                                {% else %}
+                                    <span class="text-muted">No description</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if subtype.created_at %}
+                                    <small class="text-muted">{{ subtype.created_at.strftime('%Y-%m-%d') }}</small>
+                                {% else %}
+                                    <small class="text-muted">Unknown</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('settings_bp.subtype_edit', subtype_id=subtype.id) }}" 
+                                       class="btn btn-outline-primary" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="POST" action="{{ url_for('settings_bp.subtype_delete', subtype_id=subtype.id) }}" 
+                                          class="d-inline">
+                                        <button type="submit" class="btn btn-outline-danger" 
+                                                data-confirm-delete data-item-name="{{ subtype.name }}" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-sitemap fa-4x text-muted mb-4"></i>
+                <h4 class="text-muted">No Product Subtypes Found</h4>
+                <p class="text-muted mb-4">Create product subtypes by combining categories and mining locations.</p>
+                <a href="{{ url_for('settings_bp.subtype_create') }}" class="btn-primary">
+                    <i class="fas fa-plus"></i> Create First Subtype
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if subtypes %}
+<!-- Summary Cards -->
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="settings-card">
+            <div class="card-body">
+                <h6><i class="fas fa-chart-bar me-2"></i>Subtype Summary</h6>
+                <ul class="list-unstyled mb-0">
+                    <li><strong>Total Subtypes:</strong> {{ subtypes|length }}</li>
+                    <li><strong>With Categories:</strong> {{ subtypes|selectattr('category')|list|length }}</li>
+                    <li><strong>With Mines:</strong> {{ subtypes|selectattr('mine')|list|length }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="settings-card">
+            <div class="card-body">
+                <h6><i class="fas fa-tags me-2"></i>By Category</h6>
+                {% set category_counts = {} %}
+                {% for subtype in subtypes %}
+                    {% if subtype.category %}
+                        {% set _ = category_counts.update({subtype.category.name: category_counts.get(subtype.category.name, 0) + 1}) %}
+                    {% endif %}
+                {% endfor %}
+                
+                {% if category_counts %}
+                    <ul class="list-unstyled mb-0 small">
+                        {% for category, count in category_counts.items() %}
+                        <li>{{ category }}: <strong>{{ count }}</strong></li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted small mb-0">No categorized subtypes</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="settings-card">
+            <div class="card-body">
+                <h6><i class="fas fa-lightbulb me-2"></i>Quick Tips</h6>
+                <ul class="list-unstyled mb-0 small">
+                    <li>• Subtypes combine category + mine</li>
+                    <li>• Each combination should be unique</li>
+                    <li>• Mine assignment is optional</li>
+                    <li>• Use for detailed product tracking</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+

@@ -1,0 +1,131 @@
+{% extends "settings/base.html" %}
+
+{% block title %}Mining Locations - Settings{% endblock %}
+
+{% block page_title %}Mining Locations{% endblock %}
+
+{% block page_subtitle %}
+<p class="content-subtitle">Manage mining locations for bauxite extraction</p>
+{% endblock %}
+
+{% block header_actions %}
+<a href="{{ url_for('settings_bp.mine_create') }}" class="btn-primary">
+    <i class="fas fa-plus"></i> Add Mine
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="settings-card">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="fas fa-mountain me-2"></i>
+            All Mining Locations
+        </h5>
+    </div>
+    <div class="card-body">
+        {% if mines %}
+            <div class="table-responsive">
+                <table class="settings-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Subtypes</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mine in mines %}
+                        <tr>
+                            <td>
+                                <strong>{{ mine.name }}</strong>
+                            </td>
+                            <td>
+                                {% if mine.description %}
+                                    {{ mine.description[:100] }}{% if mine.description|length > 100 %}...{% endif %}
+                                {% else %}
+                                    <span class="text-muted">No description</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-success">{{ mine.subtypes|length }} subtypes</span>
+                            </td>
+                            <td>
+                                {% if mine.created_at %}
+                                    <small class="text-muted">{{ mine.created_at.strftime('%Y-%m-%d') }}</small>
+                                {% else %}
+                                    <small class="text-muted">Unknown</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('settings_bp.mine_edit', mine_id=mine.id) }}" 
+                                       class="btn btn-outline-primary" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% if mine.subtypes|length == 0 %}
+                                    <form method="POST" action="{{ url_for('settings_bp.mine_delete', mine_id=mine.id) }}" 
+                                          class="d-inline">
+                                        <button type="submit" class="btn btn-outline-danger" 
+                                                data-confirm-delete data-item-name="{{ mine.name }}" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                    {% else %}
+                                    <button class="btn btn-outline-secondary" disabled title="Cannot delete - has subtypes">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-mountain fa-4x text-muted mb-4"></i>
+                <h4 class="text-muted">No Mining Locations Found</h4>
+                <p class="text-muted mb-4">Start by adding your first mining location to track bauxite extraction sites.</p>
+                <a href="{{ url_for('settings_bp.mine_create') }}" class="btn-primary">
+                    <i class="fas fa-plus"></i> Add First Mine
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if mines %}
+<!-- Summary Card -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="settings-card">
+            <div class="card-body">
+                <h6><i class="fas fa-chart-bar me-2"></i>Mining Summary</h6>
+                <ul class="list-unstyled mb-0">
+                    <li><strong>Total Mines:</strong> {{ mines|length }}</li>
+                    <li><strong>Mines with Subtypes:</strong> {{ mines|selectattr('subtypes')|list|length }}</li>
+                    <li><strong>Unused Mines:</strong> {{ mines|rejectattr('subtypes')|list|length }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="settings-card">
+            <div class="card-body">
+                <h6><i class="fas fa-lightbulb me-2"></i>Mining Tips</h6>
+                <ul class="list-unstyled mb-0 small">
+                    <li>• Mines represent physical extraction locations</li>
+                    <li>• Each mine can produce multiple product subtypes</li>
+                    <li>• Mines with subtypes cannot be deleted</li>
+                    <li>• Use geographic or operational names</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+

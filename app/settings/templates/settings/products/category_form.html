@@ -1,0 +1,194 @@
+{% extends "settings/base.html" %}
+
+{% block title %}{{ action }} Category - Settings{% endblock %}
+
+{% block page_title %}{{ action }} Product Category{% endblock %}
+
+{% block page_subtitle %}
+<p class="content-subtitle">
+    {% if action == 'Create' %}
+        Add a new product category to organize your bauxite products
+    {% else %}
+        Update the category information
+    {% endif %}
+</p>
+{% endblock %}
+
+{% block header_actions %}
+<a href="{{ url_for('settings_bp.categories_list') }}" class="btn-secondary">
+    <i class="fas fa-arrow-left"></i> Back to Categories
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="settings-card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-tag me-2"></i>
+                    Category Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+                    
+                    <!-- Name Field -->
+                    <div class="form-group">
+                        {{ form.name.label(class="form-label") }}
+                        {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else "")) }}
+                        {% if form.name.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.name.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            Enter a descriptive name for the category (max 50 characters)
+                        </small>
+                    </div>
+                    
+                    <!-- Description Field -->
+                    <div class="form-group">
+                        {{ form.description.label(class="form-label") }}
+                        {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else "")) }}
+                        {% if form.description.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.description.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            Optional detailed description of the category
+                        </small>
+                    </div>
+                    
+                    <!-- Form Actions -->
+                    <div class="d-flex gap-2 mt-4">
+                        {{ form.submit(class="btn-primary") }}
+                        <a href="{{ url_for('settings_bp.categories_list') }}" class="btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Help Card -->
+        <div class="settings-card">
+            <div class="card-header">
+                <h6 class="card-title">
+                    <i class="fas fa-question-circle me-2"></i>
+                    Help & Guidelines
+                </h6>
+            </div>
+            <div class="card-body">
+                <h6>Category Naming</h6>
+                <ul class="small mb-3">
+                    <li>Use clear, descriptive names</li>
+                    <li>Keep names concise (max 50 chars)</li>
+                    <li>Use title case (e.g., "High Grade Ore")</li>
+                    <li>Avoid special characters</li>
+                </ul>
+                
+                <h6>Description Tips</h6>
+                <ul class="small mb-3">
+                    <li>Explain the category purpose</li>
+                    <li>Include quality specifications</li>
+                    <li>Mention typical use cases</li>
+                    <li>Add any relevant notes</li>
+                </ul>
+                
+                <div class="alert alert-info small">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Categories help organize products and are used throughout the system for reporting and analysis.
+                </div>
+            </div>
+        </div>
+        
+        {% if action == 'Edit' and category %}
+        <!-- Category Info -->
+        <div class="settings-card mt-3">
+            <div class="card-header">
+                <h6 class="card-title">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Category Details
+                </h6>
+            </div>
+            <div class="card-body">
+                <dl class="row small">
+                    <dt class="col-sm-5">Created:</dt>
+                    <dd class="col-sm-7">
+                        {% if category.created_at %}
+                            {{ category.created_at.strftime('%Y-%m-%d %H:%M') }}
+                        {% else %}
+                            Unknown
+                        {% endif %}
+                    </dd>
+                    
+                    <dt class="col-sm-5">Last Updated:</dt>
+                    <dd class="col-sm-7">
+                        {% if category.updated_at %}
+                            {{ category.updated_at.strftime('%Y-%m-%d %H:%M') }}
+                        {% else %}
+                            Never
+                        {% endif %}
+                    </dd>
+                    
+                    <dt class="col-sm-5">Subtypes:</dt>
+                    <dd class="col-sm-7">
+                        {{ category.subtypes|length }} subtypes
+                        {% if category.subtypes|length > 0 %}
+                            <br>
+                            <a href="{{ url_for('settings_bp.subtypes_list') }}" class="small">View subtypes</a>
+                        {% endif %}
+                    </dd>
+                </dl>
+                
+                {% if category.subtypes|length > 0 %}
+                <div class="alert alert-warning small mt-3">
+                    <i class="fas fa-exclamation-triangle me-1"></i>
+                    This category has subtypes and cannot be deleted.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-focus on name field
+    const nameField = document.getElementById('name');
+    if (nameField) {
+        nameField.focus();
+    }
+    
+    // Character counter for name field
+    const nameInput = document.querySelector('input[name="name"]');
+    if (nameInput) {
+        const maxLength = 50;
+        const counter = document.createElement('small');
+        counter.className = 'form-text text-muted';
+        counter.style.float = 'right';
+        
+        function updateCounter() {
+            const remaining = maxLength - nameInput.value.length;
+            counter.textContent = `${remaining} characters remaining`;
+            counter.className = remaining < 10 ? 'form-text text-warning' : 'form-text text-muted';
+        }
+        
+        nameInput.addEventListener('input', updateCounter);
+        nameInput.parentNode.appendChild(counter);
+        updateCounter();
+    }
+});
+</script>
+{% endblock %}
+

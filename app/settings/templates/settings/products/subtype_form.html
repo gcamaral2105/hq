@@ -1,0 +1,287 @@
+{% extends "settings/base.html" %}
+
+{% block title %}{{ action }} Subtype - Settings{% endblock %}
+
+{% block page_title %}{{ action }} Product Subtype{% endblock %}
+
+{% block page_subtitle %}
+<p class="content-subtitle">
+    {% if action == 'Create' %}
+        Create a new product subtype by combining category and mining location
+    {% else %}
+        Update the product subtype information
+    {% endif %}
+</p>
+{% endblock %}
+
+{% block header_actions %}
+<a href="{{ url_for('settings_bp.subtypes_list') }}" class="btn-secondary">
+    <i class="fas fa-arrow-left"></i> Back to Subtypes
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="settings-card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-sitemap me-2"></i>
+                    Product Subtype Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+                    
+                    <!-- Name Field -->
+                    <div class="form-group">
+                        {{ form.name.label(class="form-label") }}
+                        {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else "")) }}
+                        {% if form.name.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.name.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            Enter a descriptive name for the subtype (max 100 characters)
+                        </small>
+                    </div>
+                    
+                    <!-- Category Field -->
+                    <div class="form-group">
+                        {{ form.category_id.label(class="form-label") }}
+                        {{ form.category_id(class="form-control" + (" is-invalid" if form.category_id.errors else "")) }}
+                        {% if form.category_id.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.category_id.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            Select the product category this subtype belongs to
+                        </small>
+                    </div>
+                    
+                    <!-- Mine Field -->
+                    <div class="form-group">
+                        {{ form.mine_id.label(class="form-label") }}
+                        {{ form.mine_id(class="form-control" + (" is-invalid" if form.mine_id.errors else "")) }}
+                        {% if form.mine_id.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.mine_id.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            Optionally select the mining location for this subtype
+                        </small>
+                    </div>
+                    
+                    <!-- Description Field -->
+                    <div class="form-group">
+                        {{ form.description.label(class="form-label") }}
+                        {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else "")) }}
+                        {% if form.description.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.description.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            Optional detailed description of the product subtype
+                        </small>
+                    </div>
+                    
+                    <!-- Form Actions -->
+                    <div class="d-flex gap-2 mt-4">
+                        {{ form.submit(class="btn-primary") }}
+                        <a href="{{ url_for('settings_bp.subtypes_list') }}" class="btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Help Card -->
+        <div class="settings-card">
+            <div class="card-header">
+                <h6 class="card-title">
+                    <i class="fas fa-question-circle me-2"></i>
+                    Help & Guidelines
+                </h6>
+            </div>
+            <div class="card-body">
+                <h6>Subtype Naming</h6>
+                <ul class="small mb-3">
+                    <li>Combine category and mine info</li>
+                    <li>Use descriptive, specific names</li>
+                    <li>Include quality indicators if relevant</li>
+                    <li>Keep names under 100 characters</li>
+                </ul>
+                
+                <h6>Category Selection</h6>
+                <ul class="small mb-3">
+                    <li>Required field - must select a category</li>
+                    <li>Determines product classification</li>
+                    <li>Used for reporting and analysis</li>
+                    <li>Cannot be empty</li>
+                </ul>
+                
+                <h6>Mine Assignment</h6>
+                <ul class="small mb-3">
+                    <li>Optional but recommended</li>
+                    <li>Links product to extraction site</li>
+                    <li>Helps with logistics planning</li>
+                    <li>Can be updated later</li>
+                </ul>
+                
+                <div class="alert alert-info small">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Subtypes create unique product variants by combining categories with mining locations.
+                </div>
+            </div>
+        </div>
+        
+        {% if action == 'Edit' and subtype %}
+        <!-- Subtype Info -->
+        <div class="settings-card mt-3">
+            <div class="card-header">
+                <h6 class="card-title">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Subtype Details
+                </h6>
+            </div>
+            <div class="card-body">
+                <dl class="row small">
+                    <dt class="col-sm-5">Created:</dt>
+                    <dd class="col-sm-7">
+                        {% if subtype.created_at %}
+                            {{ subtype.created_at.strftime('%Y-%m-%d %H:%M') }}
+                        {% else %}
+                            Unknown
+                        {% endif %}
+                    </dd>
+                    
+                    <dt class="col-sm-5">Last Updated:</dt>
+                    <dd class="col-sm-7">
+                        {% if subtype.updated_at %}
+                            {{ subtype.updated_at.strftime('%Y-%m-%d %H:%M') }}
+                        {% else %}
+                            Never
+                        {% endif %}
+                    </dd>
+                    
+                    <dt class="col-sm-5">Current Category:</dt>
+                    <dd class="col-sm-7">
+                        {% if subtype.category %}
+                            {{ subtype.category.name }}
+                        {% else %}
+                            <span class="text-muted">None</span>
+                        {% endif %}
+                    </dd>
+                    
+                    <dt class="col-sm-5">Current Mine:</dt>
+                    <dd class="col-sm-7">
+                        {% if subtype.mine %}
+                            {{ subtype.mine.name }}
+                        {% else %}
+                            <span class="text-muted">None</span>
+                        {% endif %}
+                    </dd>
+                </dl>
+                
+                <div class="alert alert-success small mt-3">
+                    <i class="fas fa-check-circle me-1"></i>
+                    This subtype can be safely deleted if no longer needed.
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Quick Links -->
+        <div class="settings-card mt-3">
+            <div class="card-header">
+                <h6 class="card-title">
+                    <i class="fas fa-external-link-alt me-2"></i>
+                    Quick Links
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('settings_bp.categories_list') }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-tags me-1"></i> Manage Categories
+                    </a>
+                    <a href="{{ url_for('settings_bp.mines_list') }}" class="btn btn-sm btn-outline-success">
+                        <i class="fas fa-mountain me-1"></i> Manage Mines
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-focus on name field
+    const nameField = document.getElementById('name');
+    if (nameField) {
+        nameField.focus();
+    }
+    
+    // Character counter for name field
+    const nameInput = document.querySelector('input[name="name"]');
+    if (nameInput) {
+        const maxLength = 100;
+        const counter = document.createElement('small');
+        counter.className = 'form-text text-muted';
+        counter.style.float = 'right';
+        
+        function updateCounter() {
+            const remaining = maxLength - nameInput.value.length;
+            counter.textContent = `${remaining} characters remaining`;
+            counter.className = remaining < 20 ? 'form-text text-warning' : 'form-text text-muted';
+        }
+        
+        nameInput.addEventListener('input', updateCounter);
+        nameInput.parentNode.appendChild(counter);
+        updateCounter();
+    }
+    
+    // Auto-generate subtype name based on category and mine selection
+    const categorySelect = document.querySelector('select[name="category_id"]');
+    const mineSelect = document.querySelector('select[name="mine_id"]');
+    const nameInput2 = document.querySelector('input[name="name"]');
+    
+    function generateName() {
+        if (!nameInput2 || nameInput2.value.trim() !== '') return; // Don't overwrite existing names
+        
+        const categoryText = categorySelect.options[categorySelect.selectedIndex]?.text;
+        const mineText = mineSelect.options[mineSelect.selectedIndex]?.text;
+        
+        if (categoryText && categoryText !== '-- Select Category --') {
+            let suggestedName = categoryText;
+            if (mineText && mineText !== '-- No Mine Selected --') {
+                suggestedName += ` - ${mineText}`;
+            }
+            nameInput2.placeholder = `Suggested: ${suggestedName}`;
+        }
+    }
+    
+    if (categorySelect && mineSelect && nameInput2) {
+        categorySelect.addEventListener('change', generateName);
+        mineSelect.addEventListener('change', generateName);
+        generateName(); // Initial call
+    }
+});
+</script>
+{% endblock %}
+
