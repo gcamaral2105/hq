@@ -21,6 +21,11 @@ class ProductCategory(BaseModel):
         comment="Unique name of the product category"
     )
     
+    description: Optional[str] = db.Column(
+        db.Text,
+        comment="Detailed description of the partner"
+    )
+    
     # Relationships
     subtypes = db.relationship(
         'ProductSubtype', 
@@ -69,6 +74,11 @@ class Mine(BaseModel):
         unique=True, 
         nullable=False,
         comment="Unique name of the mine"
+    )
+    
+    description: Optional[str] = db.Column(
+        db.Text,
+        comment="Detailed description of the partner"
     )
 
     # Relationships
